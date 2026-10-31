@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+  <meta name="theme-color" content="#07120f">
+  <meta name="description" content="SHIFT is chess with a twist: every capture transfers the victim's movement power. Built for touch, with optional tilt.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SHIFT">
+  <title>SHIFT — Chess, Transmuted</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true">
+    <span class="ambient-orb ambient-orb-a"></span>
+    <span class="ambient-orb ambient-orb-b"></span>
+    <span class="ambient-grid"></span>
+  </div>
+
+  <svg class="svg-sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <filter id="pieceShadow" x="-40%" y="-30%" width="180%" height="190%">
+        <feDropShadow dx="0" dy="2.1" stdDeviation="1.7" flood-color="#020906" flood-opacity=".68"/>
+      </filter>
+    </defs>
+
+    <symbol id="piece-base" viewBox="0 0 100 100">
+      <ellipse cx="50" cy="90" rx="29" ry="5.2" fill="#010806" opacity=".38"/>
+      <path d="M21 82.5c0-3.5 3.6-5.2 9-6.2h40c5.4 1 9 2.7 9 6.2 0 5-8.6 7.4-29 7.4S21 87.5 21 82.5Z" fill="currentColor"/>
+      <ellipse cx="50" cy="79.4" rx="20.5" ry="4.6" fill="currentColor"/>
+      <path d="M25.5 83.2c6 2.8 14 4 24.5 4s18.5-1.2 24.5-4" fill="none" stroke="#fff" stroke-opacity=".24" stroke-width="1.2" stroke-linecap="round"/>
+    </symbol>
+
+    <symbol id="piece-pawn" viewBox="0 0 100 100">
+      <use href="#piece-base"/>
+      <circle cx="50" cy="27" r="13.4" fill="currentColor"/>
+      <path d="M37 44.5c2.8.9 23.2.9 26 0l2.3 6.2c-6.3 2-24.3 2-30.6 0L37 44.5Z" fill="currentColor"/>
+      <path d="M41 51.4c4.2 4.3 6.3 11.1 3.2 17.7h11.6C52.7 62.5 54.8 55.7 59 51.4H41Z" fill="currentColor"/>
+      <path d="M36.5 68h27c1.4 4.7 3.9 8 6.5 11.5H30c2.6-3.5 5.1-6.8 6.5-11.5Z" fill="currentColor"/>
+      <ellipse cx="45.6" cy="24" rx="4.2" ry="6.2" fill="#fff" opacity=".24" transform="rotate(-18 45.6 24)"/>
+      <path d="M43 54.5c1.9 4.2 2.8 9.2 1.4 13.8" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M35.7 68.5h28.6" stroke="var(--detail)" stroke-opacity=".48" stroke-width="1.2"/>
+    </symbol>
+
+    <symbol id="piece-rook" viewBox="0 0 100 100">
+      <use href="#piece-base"/>
+      <path d="M29 20h10v8h7v-8h8v8h7v-8h10v17l-5 4.8V76h5v7H29v-7h5V41.8L29 37V20Z" fill="currentColor"/>
+      <path d="M35 43h30M34 51.5h32" stroke="#fff" stroke-opacity=".13" stroke-width="1.4"/>
+      <path d="M42 29.5h16v9H42z" fill="#000" opacity=".18"/>
+      <path d="M38 75.5h24" stroke="var(--detail)" stroke-opacity=".55" stroke-width="1.2"/>
+      <path d="M39 38.5v31" stroke="#fff" stroke-opacity=".16" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M29.8 21.4h8.4v5.4h-8.4zM42.9 21.4h8.2v5.4h-8.2zM56 21.4h8.2v5.4H56Z" fill="#fff" opacity=".12"/>
+    </symbol>
+
+    <symbol id="piece-knight" viewBox="0 0 100 100">
+      <use href="#piece-base"/>
+      <g transform="translate(9.8 10) scale(.1667)">
+        <path fill="currentColor" d="M96 48L82.7 61.3C70.7 73.3 64 89.5 64 106.5l0 132.4c0 10.7 5.3 20.7 14.2 26.6l10.6 7c14.3 9.6 32.7 10.7 48.1 3l3.2-1.6c2.6-1.3 5-2.8 7.3-4.5l49.4-37c6.6-5 15.7-5 22.3 0c10.2 7.7 9.9 23.1-.7 30.3L90.4 350C73.9 361.3 64 380 64 400l320 0 28.9-159c2.1-11.3 3.1-22.8 3.1-34.3l0-14.7C416 86 330 0 224 0L83.8 0C72.9 0 64 8.9 64 19.8c0 7.5 4.2 14.3 10.9 17.7L96 48zm24 68a20 20 0 1 1 40 0 20 20 0 1 1 -40 0z"/>
+      </g>
+      <path d="M31.6 75.6c5.7-2.2 10.5-7.7 13.6-15.8" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M62.6 35.2c6.6 4.5 11.2 10.6 13.7 18.2" fill="none" stroke="var(--detail)" stroke-opacity=".42" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M31 84h40" stroke="var(--detail)" stroke-opacity=".34" stroke-width="1.1"/>
+    </symbol>
+
+    <symbol id="piece-bishop" viewBox="0 0 100 100">
+      <use href="#piece-base"/>
+      <circle cx="50" cy="13.5" r="4.4" fill="currentColor"/>
+      <path d="M50 19.3c8.7 8.7 14.6 18.6 14.6 28.2 0 8.9-5.9 15-14.6 17.3-8.7-2.3-14.6-8.4-14.6-17.3 0-9.6 5.9-19.5 14.6-28.2Z" fill="currentColor"/>
+      <path d="M37.5 58.5c3.2 4.1 7.3 6.5 12.5 7.3 5.2-.8 9.3-3.2 12.5-7.3l4 12.7H33.5l4-12.7Z" fill="currentColor"/>
+      <path d="M30 71h40l2.6 11H27.4L30 71Z" fill="currentColor"/>
+      <path d="M49 33.5 52.3 43" stroke="var(--detail)" stroke-width="2.2" stroke-linecap="round" opacity=".72"/>
+      <path d="M44 25.5c3.8 4.6 6.4 8.4 8.5 12.2M38.7 52.5c2 3.9 4.3 6.1 6.7 7.5" fill="none" stroke="#fff" stroke-opacity=".22" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M31.4 71.5h37.2" stroke="var(--detail)" stroke-opacity=".35" stroke-width="1.1"/>
+    </symbol>
+
+    <symbol id="piece-queen" viewBox="0 0 100 100">
+      <use href="#piece-base"/>
+      <circle cx="23.5" cy="21" r="4.4" fill="currentColor"/>
+      <circle cx="36.7" cy="15.2" r="4.3" fill="currentColor"/>
+      <circle cx="50" cy="11.2" r="4.6" fill="currentColor"/>
+      <circle cx="63.3" cy="15.2" r="4.3" fill="currentColor"/>
+      <circle cx="76.5" cy="21" r="4.4" fill="currentColor"/>
+      <path d="M23.2 23.3 28 48h44l4.8-24.7-12.2 10-6.9-18.2L50 35.5 42.3 15.1l-6.9 18.2-12.2-10Z" fill="currentColor"/>
+      <path d="M29.2 51.4h41.6l-2.4 9.5 5.6 12.1H26l5.6-12.1-2.4-9.5Z" fill="currentColor"/>
+      <path d="M30.4 53.4c2.5 1.4 12.1 2.2 19.6 2.2s17.1-.8 19.6-2.2" fill="none" stroke="var(--detail)" stroke-opacity=".55" stroke-width="1.3"/>
+      <path d="M42.5 63.2c2.4 3.9 2.9 7.2 1.5 10.7M57.5 63.2c-2.4 3.9-2.9 7.2-1.5 10.7" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.4" stroke-linecap="round"/>
+      <path d="M31.8 73h36.4" stroke="var(--detail)" stroke-opacity=".32" stroke-width="1.2"/>
+    </symbol>
+
+    <symbol id="piece-king" viewBox="0 0 100 100">
+      <use href="#piece-base"/>
+      <path d="M47.5 5.5h5v8h7.5v5H52.5v8h-5v-8H40v-5h7.5v-8Z" fill="currentColor"/>
+      <path d="M25 31.3 37.3 38 50 22.5 62.7 38 75 31.3l-4.4 20.7H29.4L25 31.3Z" fill="currentColor"/>
+      <path d="M29.5 54h41l-2.5 9.4 6.3 12.1H25.7l6.3-12.1-2.5-9.4Z" fill="currentColor"/>
+      <path d="M30 56c3.3 1.6 12.6 2.4 20 2.4s16.7-.8 20-2.4" fill="none" stroke="var(--detail)" stroke-opacity=".55" stroke-width="1.4"/>
+      <path d="M42.5 65.8c2.5 3.7 2.8 7 1.3 10.3M57.5 65.8c-2.5 3.7-2.8 7-1.3 10.3" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="50" cy="29.8" r="2.1" fill="var(--detail)" opacity=".85"/>
+    </symbol>
+
+    <symbol id="royal-mark" viewBox="0 0 24 24">
+      <path d="m3 8 4 3 5-7 5 7 4-3-2 9H5L3 8Z" fill="currentColor"/>
+      <path d="M6 19h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </symbol>
+
+    <symbol id="icon-swap" viewBox="0 0 24 24">
+      <path d="M4 8h12.5m0 0-3-3m3 3-3 3M20 16H7.5m0 0 3 3m-3-3 3-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+  </svg>
+
+  <div class="app">
+    <header class="topbar">
+      <div class="brand" aria-label="SHIFT, chess transmuted">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 44 44"><path d="M22 4 36 13v18L22 40 8 31V13L22 4Z" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".52"/><path d="M28.5 11.5 16 24h7l-3.5 9.5L33 20h-7l2.5-8.5Z" fill="currentColor"/></svg>
+        </span>
+        <span class="brand-copy">
+          <span class="brand-name">SHIFT</span>
+          <span class="brand-sub">CHESS, TRANSMUTED</span>
+        </span>
+      </div>
+
+      <div class="toolbar" aria-label="Game controls">
+        <button class="tool-btn" id="soundButton" type="button" aria-label="Mute sound" title="Sound (M)">
+          <svg class="icon icon-sound-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10H4Z" fill="currentColor"/><path d="M16 9.2a4 4 0 0 1 0 5.6M18.5 6.5a8 8 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <svg class="icon icon-sound-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10H4Z" fill="currentColor"/><path d="m16 10 5 5m0-5-5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </button>
+        <button class="tool-btn" id="tiltButton" type="button" aria-label="Enable tilt" aria-pressed="false" title="Tilt the board (T)">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 8.5a7.5 7.5 0 0 0 0 7M20.5 8.5a7.5 7.5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".7"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg>
+          <span class="active-dot" aria-hidden="true"></span>
+        </button>
+        <button class="tool-btn" id="helpButton" type="button" aria-label="How to play" title="How to play (H)">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.6 9.2a2.6 2.6 0 1 1 3.7 2.4c-.8.4-1.3 1-1.3 1.9v.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="17.1" r="1" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="game-layout">
+      <section class="board-column" aria-label="Chess board">
+        <div class="turn-panel" id="turnPanel">
+          <div class="turn-identity">
+            <span class="turn-orb" id="turnOrb" aria-hidden="true"><span></span></span>
+            <div class="turn-copy">
+              <p class="eyebrow" id="turnLabel">IVORY TO MOVE</p>
+              <p class="turn-hint" id="turnHint">Tap a piece to reveal its power</p>
+            </div>
+          </div>
+          <div class="turn-meta">
+            <span class="meta-number" id="moveNumber">1</span>
+            <span class="meta-label">MOVE</span>
+          </div>
+        </div>
+
+        <div class="board-shell" id="boardShell">
+          <span class="shell-rivet rivet-a" aria-hidden="true"></span>
+          <span class="shell-rivet rivet-b" aria-hidden="true"></span>
+          <span class="shell-rivet rivet-c" aria-hidden="true"></span>
+          <span class="shell-rivet rivet-d" aria-hidden="true"></span>
+          <div class="board-perspective" id="boardPerspective">
+            <div class="board-frame">
+              <div class="board" id="board" role="grid" aria-label="8 by 8 chess board"></div>
+              <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
+              <div class="board-glare" aria-hidden="true"></div>
+            </div>
+          </div>
+          <div class="board-status" id="boardStatus" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><use href="#icon-swap"/></svg>
+            <span>CAPTURES TRANSFER POWER</span>
+          </div>
+        </div>
+
+        <div class="below-board">
+          <div class="power-readout" id="powerReadout">
+            <span class="readout-icon" id="readoutIcon" aria-hidden="true">
+              <svg viewBox="0 0 100 100"><use href="#piece-pawn"/></svg>
+            </span>
+            <span class="readout-copy">
+              <span class="eyebrow" id="readoutEyebrow">THE SHIFT</span>
+              <strong id="readoutTitle">A capture rewrites a piece</strong>
+              <span class="readout-sub" id="readoutSub">Tap any piece to inspect its power.</span>
+            </span>
+          </div>
+          <div class="action-bar">
+            <button class="action-btn" id="undoButton" type="button" aria-label="Undo last move" title="Undo (U)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7 4 11l4 4M4.5 11H14a5 5 0 0 1 0 10h-2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span>Undo</span>
+            </button>
+            <button class="action-btn" id="rulesButton" type="button" aria-label="Open rules">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h9.5A2.5 2.5 0 0 1 17 7v13H7.5A2.5 2.5 0 0 1 5 17.5v-13Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5 17.5A2.5 2.5 0 0 1 7.5 15H17M18.5 7v13" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+              <span>Rules</span>
+            </button>
+            <button class="action-btn accent" id="newButton" type="button" aria-label="Start a new game" title="New game (N)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              <span>New</span>
+            </button>
+          </div>
+        </div>
+
+        <section class="mobile-shift" id="mobileShift" aria-label="Latest power shift">
+          <div class="mobile-shift-head">
+            <span class="eyebrow">SHIFT FEED</span>
+            <span class="capture-count" id="mobileCaptureCount">0 CAPTURES</span>
+          </div>
+          <div class="shift-event" id="mobileShiftEvent">
+            <p class="shift-empty">No powers have changed hands. Yet.</p>
+          </div>
+        </section>
+
+        <section class="mobile-codex" aria-label="Power codex">
+          <div class="mobile-shift-head">
+            <span class="eyebrow">POWER CODEX</span>
+            <span class="capture-count">MOVEMENT AT A GLANCE</span>
+          </div>
+          <div class="codex-grid">
+            <span class="codex-item"><span class="codex-piece"><svg viewBox="0 0 100 100"><use href="#piece-pawn"/></svg></span><span><b>Pawn</b>One step</span></span>
+            <span class="codex-item"><span class="codex-piece"><svg viewBox="0 0 100 100"><use href="#piece-knight"/></svg></span><span><b>Knight</b>L-leap</span></span>
+            <span class="codex-item"><span class="codex-piece"><svg viewBox="0 0 100 100"><use href="#piece-bishop"/></svg></span><span><b>Bishop</b>Diagonal</span></span>
+            <span class="codex-item"><span class="codex-piece"><svg viewBox="0 0 100 100"><use href="#piece-rook"/></svg></span><span><b>Rook</b>Straight</span></span>
+            <span class="codex-item"><span class="codex-piece"><svg viewBox="0 0 100 100"><use href="#piece-queen"/></svg></span><span><b>Queen</b>Any line</span></span>
+            <span class="codex-item"><span class="codex-piece"><svg viewBox="0 0 100 100"><use href="#piece-king"/></svg></span><span><b>King</b>One step</span></span>
+          </div>
+        </section>
+      </section>
+
+      <aside class="side-column" aria-label="Game intelligence">
+        <section class="panel twist-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">THE ONE RULE</span>
+            <span class="rule-index">01</span>
+          </div>
+          <h2>Every capture<br><em>transfers power.</em></h2>
+          <p class="twist-copy">Your piece inherits the victim's movement. A pawn can seize a queen's reach. A queen can be reduced to a single step.</p>
+          <div class="swap-diagram" aria-hidden="true">
+            <span class="diagram-piece light"><svg viewBox="0 0 100 100"><use href="#piece-knight"/></svg></span>
+            <span class="diagram-swap"><svg viewBox="0 0 24 24"><use href="#icon-swap"/></svg></span>
+            <span class="diagram-piece dark"><svg viewBox="0 0 100 100"><use href="#piece-queen"/></svg></span>
+            <span class="diagram-caption">KNIGHT TAKES QUEEN</span>
+            <span class="diagram-result">KNIGHT <b>BECOMES</b> QUEEN</span>
+          </div>
+          <div class="twist-foot">
+            <span class="crown-dot" aria-hidden="true"></span>
+            <span>The royal crown never moves. A king remains a king — only its stride changes.</span>
+          </div>
+        </section>
+
+        <section class="panel shift-panel" id="shiftPanel">
+          <div class="panel-heading">
+            <span class="eyebrow">SHIFT FEED</span>
+            <span class="live-pip"><i></i> LIVE</span>
+          </div>
+          <div class="shift-event" id="desktopShiftEvent">
+            <p class="shift-empty">No powers have changed hands. Yet.</p>
+          </div>
+          <div class="swap-tally">
+            <span><b id="swapCount">0</b> swaps</span>
+            <span><b id="captureCount">0</b> captures</span>
+            <span><b id="turnCount">1</b> turn</span>
+          </div>
+        </section>
+
+        <section class="panel taken-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">THE TAKEN</span>
+            <span class="take-total" id="takeTotal">32 ON BOARD</span>
+          </div>
+          <div class="taken-row">
+            <span class="taken-side"><i class="side-swatch ivory"></i>IVORY</span>
+            <div class="taken-pieces" id="takenByWhite"><span class="taken-empty">—</span></div>
+          </div>
+          <div class="taken-row">
+            <span class="taken-side"><i class="side-swatch onyx"></i>ONYX</span>
+            <div class="taken-pieces" id="takenByBlack"><span class="taken-empty">—</span></div>
+          </div>
+        </section>
+
+        <section class="panel log-panel">
+          <div class="panel-heading">
+            <span class="eyebrow">MOVE LEDGER</span>
+            <span class="notation-key">× CAPTURE</span>
+          </div>
+          <ol class="move-log" id="moveLog">
+            <li class="log-empty">The board is still. Make the first move.</li>
+          </ol>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <span>PASS &amp; PLAY</span>
+      <span class="footer-rule"></span>
+      <span>LOCAL DUEL · NO ACCOUNT</span>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <dialog class="modal" id="rulesDialog" aria-labelledby="rulesTitle">
+    <div class="modal-inner">
+      <button class="modal-close" data-close-dialog type="button" aria-label="Close rules">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+      <span class="eyebrow">HOW TO PLAY</span>
+      <h2 id="rulesTitle">Chess, with one<br><em>beautiful complication.</em></h2>
+      <p class="modal-lede">All the familiar rules still hold. Then a capture changes the physics of the board.</p>
+
+      <div class="rule-grid">
+        <article class="rule-card rule-card-wide">
+          <span class="rule-number">01</span>
+          <h3>Captures transfer power</h3>
+          <p>When your piece captures, it inherits the captured piece's movement. If a knight takes a queen, that knight now moves like a queen. If a queen takes a pawn, it is reduced to a pawn's stride.</p>
+          <div class="mini-transfer">
+            <span class="mini-piece" data-piece="n" data-color="w"></span>
+            <span class="mini-arrow">×</span>
+            <span class="mini-piece" data-piece="q" data-color="b"></span>
+            <span class="mini-arrow">→</span>
+            <span class="mini-piece" data-piece="q" data-color="w"></span>
+          </div>
+        </article>
+        <article class="rule-card">
+          <span class="rule-number">02</span>
+          <h3>The crown is permanent</h3>
+          <p>A king stays royal no matter which power it captures. It can become a queen on legs — but it is still the piece that must be protected.</p>
+        </article>
+        <article class="rule-card">
+          <span class="rule-number">03</span>
+          <h3>Everything else is chess</h3>
+          <p>Check, checkmate and stalemate remain. Castling works while your king still has king power and your rook still has rook power.</p>
+        </article>
+        <article class="rule-card">
+          <span class="rule-number">04</span>
+          <h3>Pawns still promote</h3>
+          <p>Any piece moving with pawn power that reaches the far rank becomes a queen. Capture first, then promotion applies.</p>
+        </article>
+        <article class="rule-card tilt-card">
+          <span class="rule-number">05</span>
+          <h3>Optional tilt</h3>
+          <p>On supported phones and tablets, tap the tilt button to lean the board with your device. iOS asks for motion access first — nothing is read until you allow it.</p>
+        </article>
+      </div>
+      <button class="modal-primary" data-close-dialog type="button">Return to the board</button>
+    </div>
+  </dialog>
+
+  <dialog class="modal confirm-modal" id="newDialog" aria-labelledby="newTitle">
+    <div class="modal-inner compact">
+      <button class="modal-close" data-close-dialog type="button" aria-label="Close new game dialog">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </button>
+      <span class="eyebrow">FRESH BOARD</span>
+      <h2 id="newTitle">Begin again?</h2>
+      <p class="modal-lede">The current game will be cleared. Powers return to their original pieces.</p>
+      <div class="modal-actions">
+        <button class="modal-secondary" data-close-dialog type="button">Keep playing</button>
+        <button class="modal-primary" id="confirmNewButton" type="button">New game</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="modal result-modal" id="resultDialog" aria-labelledby="resultTitle">
+    <div class="modal-inner compact">
+      <span class="eyebrow" id="resultEyebrow">GAME OVER</span>
+      <div class="result-crown" id="resultCrown" aria-hidden="true">
+        <svg viewBox="0 0 100 100"><use href="#piece-king"/></svg>
+      </div>
+      <h2 id="resultTitle">Checkmate</h2>
+      <p class="modal-lede" id="resultText">Ivory takes the crown.</p>
+      <div class="result-stats">
+        <span><b id="resultMoves">0</b> moves</span>
+        <span><b id="resultCaptures">0</b> captures</span>
+        <span><b id="resultSwaps">0</b> swaps</span>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-secondary" id="reviewButton" type="button">Review board</button>
+        <button class="modal-primary" id="rematchButton" type="button">Play again</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
